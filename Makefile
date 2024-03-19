@@ -33,12 +33,10 @@ clean:
 	find . -name "#*#" -delete -o -name "*~" -delete
 	$(RM) coding-style-reports.log
 	$(RM) vgcore*
-	clear
 
 fclean: clean
 	$(RM) $(NAME)
 	$(RM) lib/libmy.a
-	clear
 
 re: fclean all
 
