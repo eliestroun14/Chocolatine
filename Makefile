@@ -29,14 +29,14 @@ build_lib:
 
 clean:
 	make fclean -C ./lib
-	$(RM) $(OBJS) $(NAME)
+	$(RM) $(OBJS)
 	find . -name "#*#" -delete -o -name "*~" -delete
 	$(RM) coding-style-reports.log
 	$(RM) vgcore*
 	clear
 
 fclean: clean
-	$(RM) a.out
+	$(RM) $(NAME)
 	$(RM) lib/libmy.a
 	clear
 

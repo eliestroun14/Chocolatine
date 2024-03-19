@@ -1,5 +1,10 @@
 name: Chocolatine
 
+env:
+  MIRROR_URL: "git@github.com:EpitechPromo2028/B-DOP-200-REN-2-1-chocolatine-elie.stroun.git"
+  EXECUTABLES:
+    "pain_au_chocolat_de_test"
+
 on:
   push:
     branches:
@@ -12,29 +17,37 @@ on:
 jobs:
   check_coding_style:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/epitech/coding-style-checker:latest
     steps:
-      - run: |
-          check.sh $(pwd) $(pwd)
-          cat coding-style-reports.log
-          exit 1
+      - uses: actions/checkout@v2
+      - name: Run coding style checker
+        run: check.sh $(pwd) $(pwd)
+      - name: Display coding style errors
+        run: |
+          if [ -f coding-style-report.log ]; then
+            cat coding-style-report.log
+            exit 1
+          fi
 
   check_program_compilation:
     needs: check_coding_style
     runs-on: ubuntu-latest
-    env:
-      EXECUTABLES: "mysh,lib/my/libmy.a"
+    container:
+      image: epitechcontent/epitest-docker
     steps:
       - uses: actions/checkout@v2
       - name: Build program
-        run: |
-          make clean
-          make
+        run: make
+        timeout-minutes: 2
+      - name: Clean build
+        run: make clean
       - name: Verify executables
         run: |
           for executable in ${EXECUTABLES//,/ }
           do
             if [ ! -f "$executable" ] || [ ! -x "$executable" ]; then
-              echo "Error: executable '$executable' not found or not executable"
+              echo "$executable is not there or not executable"
               exit 1
             fi
           done
@@ -42,20 +55,27 @@ jobs:
   run_tests:
     needs: check_program_compilation
     runs-on: ubuntu-latest
+    container:
+      image: epitechcontent/epitest-docker
     steps:
       - uses: actions/checkout@v2
       - name: Run tests
-        run: |
-          make tests_run
+        run: make tests_run
+        timeout-minutes: 2
 
   push_to_mirror:
     needs: run_tests
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - uses: pixta-dev/repository-mirroring-action@v1
-        with:
-          target_repo_url: git@github.com:EpitechPromo2028/B-DOP-200-REN-2-1-chocolatine-elie.stroun.git
-          ssh_private_key: ${{ secrets.CHOCOLATINE_TOKEN }}
+      - uses: actions/checkout@v2
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.GIT_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+      - name: Push to mirror repository
+        run: |
+          git remote add mirror ${{ env.MIRROR_URL }}
+          git push --mirror mirror
