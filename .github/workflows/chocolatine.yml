@@ -1,0 +1,73 @@
+name: Chocolatine
+
+on:
+  push:
+    branches:
+      - '*'
+      - '!ga-ignore-*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  check_coding_style:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Check coding style
+        uses: pixta-dev/repository-mirroring-action@v1
+        with:
+          github-token: ${{ secrets.CHOCOLATINE_TOKEN }}
+          destination-github-username: YOUR_GITHUB_USERNAME
+          destination-repository-name: YOUR_REPOSITORY_NAME
+          destination-branch-name: main
+          source-directory: .
+          destination-directory: .
+          commit-message: "Automated coding style check"
+      - name: Display coding style errors
+        if: failure()
+        run: |
+          coding-style . .
+          cat coding-style-reports.log
+          exit 1
+
+  check_program_compilation:
+    runs-on: ubuntu-latest
+    env:
+      EXECUTABLES: "mysh,lib/my/libmy.a"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build program
+        run: |
+          make clean
+          make
+      - name: Verify executables
+        run: |
+          for executable in ${EXECUTABLES//,/ }
+          do
+            if [ ! -f "$executable" ] || [ ! -x "$executable" ]; then
+              echo "Error: executable '$executable' not found or not executable"
+              exit 1
+            fi
+          done
+
+  run_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run tests
+        run: |
+          make tests_run
+
+  push_to_mirror:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v3
+            with:
+              fetch-depth: 0
+          - uses: pixta-dev/repository-mirroring-action@v1
+            with:
+              target_repo_url:
+                git@github.com:EpitechPromo2028/B-DOP-200-REN-2-1-chocolatine-elie.stroun.git
+              ssh_private_key:
+                ${{ secrets.CHOCOLATINE_TOKEN }}
