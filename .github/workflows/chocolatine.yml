@@ -28,7 +28,7 @@ jobs:
             part1=$(echo $line | cut -d: -f1)
             part2=$(echo $line | cut -d: -f2)
             part3=$(echo $line | cut -d: -f3)
-            title=$("coding style error")
+            title=$(echo "coding style error")
             error=$(echo $line | cut -d: -f4)
             exit_code=1
             echo "::error file=$part1 line=$part2, title=$title::$error_";
