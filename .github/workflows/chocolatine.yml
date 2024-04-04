@@ -31,6 +31,7 @@ jobs:
             part3=$(echo $line | cut -d: -f3)
             title=$(echo "coding style error")
             error=$(echo $line | cut -d: -f4)
+            echo "test"
             exit_code=1
             echo "::error file=$part1 line=$part2, title=$title::$error_";
           done < coding-style-reports.log
