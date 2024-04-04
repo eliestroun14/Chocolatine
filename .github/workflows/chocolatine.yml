@@ -20,10 +20,10 @@ jobs:
       image: ghcr.io/epitech/coding-style-checker:latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run coding style checker
-        run: check.sh $(pwd) $(pwd)
       - name: Display coding style errors
         run: |
+          check.sh $(pwd) $(pwd)
+          exit_code=0;
           cat coding-style-reports.log | while read line; do
             part1=$(echo $line | cut -d: -f1)
             part2=$(echo $line | cut -d: -f2)
