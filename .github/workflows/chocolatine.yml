@@ -32,7 +32,7 @@ jobs:
             title=$(echo "$part3 coding style error")
             error=$(echo $line | cut -d: -f4)
             echo "test"
-            exit_code=1
+            exit_code=1;
             echo "::error file=$part1, line=$part2, title=$title::$error";
           done < coding-style-reports.log
           echo "plplpl $exit_code"
