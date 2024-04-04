@@ -37,6 +37,7 @@ jobs:
             echo "test"
             echo "::error file=$part1, line=$part2, title=$title::$error";
           done < coding-style-reports.log
+          exit 1
 
   check_program_compilation_w_make:
     needs: check_coding_style_w_epitech_docker
