@@ -35,8 +35,8 @@ jobs:
             exit_code=1
             echo "::error file=$part1, line=$part2, title=$title::$error";
           done < coding-style-reports.log
-          echo "plplpl"
-          if [ "$exit_code" == "1" ]
+          echo "plplpl $exit_code"
+          if [ $exit_code -gt 0 ]
           then
             echo "toto"
             exit 1
