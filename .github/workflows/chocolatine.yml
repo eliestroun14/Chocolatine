@@ -14,7 +14,7 @@ on:
       - '*'
 
 jobs:
-  check_coding_style_w_epitech_docker:
+  check_coding_style:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/epitech/coding-style-checker:latest
@@ -39,8 +39,8 @@ jobs:
           done < coding-style-reports.log
           exit 1
 
-  check_program_compilation_w_make:
-    needs: check_coding_style_w_epitech_docker
+  check_program_compilation:
+    needs: [ check_coding_style ]
     runs-on: ubuntu-latest
     container:
       image: epitechcontent/epitest-docker
@@ -62,7 +62,7 @@ jobs:
           done
 
   run_tests:
-    needs: check_program_compilation_w_make
+    needs: check_program_compilation
     runs-on: ubuntu-latest
     container:
       image: epitechcontent/epitest-docker
