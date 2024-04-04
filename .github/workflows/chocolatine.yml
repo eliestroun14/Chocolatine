@@ -23,6 +23,7 @@ jobs:
       - name: Display coding style errors
         run: |
           check.sh $(pwd) $(pwd)
+          echo "test"
           exit_code=0;
           cat coding-style-reports.log | while read line; do
             part1=$(echo $line | cut -d: -f1)
