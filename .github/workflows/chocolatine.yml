@@ -14,23 +14,33 @@ on:
       - '*'
 
 jobs:
-  check_coding_style:
+  check_coding_style_w_epitech_docker:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/epitech/coding-style-checker:latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Run coding style checker
         run: check.sh $(pwd) $(pwd)
       - name: Display coding style errors
         run: |
           if [ -f coding-style-report.log ]; then
-            cat coding-style-report.log
-            exit 1
+            cat coding-style-report.log | while read line; do
+              part1=$(echo $line | cut -d: -f1)
+              part2=$(echo $line | cut -d: -f2)
+              part3=$(echo $line | cut -d: -f3)
+              title= $("coding style error")
+              error=$(echo $line | cut -d: -f4)
+              exit_code=1
+              echo -e "::error file=$part1 line=$part2, title=$title::$error_";
+            done < coding-style-report.log
+            if [ $exit_code -eq 1 ]
+            then
+              exit 1
           fi
 
-  check_program_compilation:
-    needs: check_coding_style
+  check_program_compilation_w_make:
+    needs: check_coding_style_w_epitech_docker
     runs-on: ubuntu-latest
     container:
       image: epitechcontent/epitest-docker
@@ -52,7 +62,7 @@ jobs:
           done
 
   run_tests:
-    needs: check_program_compilation
+    needs: check_program_compilation_w_make
     runs-on: ubuntu-latest
     container:
       image: epitechcontent/epitest-docker
