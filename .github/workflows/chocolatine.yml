@@ -23,8 +23,11 @@ jobs:
       - name: Display coding style errors
         run: |
           check.sh $(pwd) $(pwd)
+          if [ ! -s coding-style-reports.log ]
+            then
+              exit 0
+          fi
           echo "test"
-          exit_code=0;
           cat coding-style-reports.log | while read line; do
             part1=$(echo $line | cut -d: -f1)
             part2=$(echo $line | cut -d: -f2)
@@ -32,15 +35,8 @@ jobs:
             title=$(echo "$part3 coding style error")
             error=$(echo $line | cut -d: -f4)
             echo "test"
-            exit_code=1;
             echo "::error file=$part1, line=$part2, title=$title::$error";
           done < coding-style-reports.log
-          echo "plplpl $exit_code"
-          if [ $exit_code -gt 0 ]
-          then
-            echo "toto"
-            exit 1
-          fi
 
   check_program_compilation_w_make:
     needs: check_coding_style_w_epitech_docker
